@@ -1,4 +1,4 @@
-📊 Portfolio Allocation Tracker
+#📊 Portfolio Allocation Tracker#
 
 A privacy-focused web application to visualize and manage personal investment portfolio allocation.
 
