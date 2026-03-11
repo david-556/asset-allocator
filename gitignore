@@ -1,0 +1,28 @@
+### Node / TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+dist/
+build/
+out/
+coverage/
+
+# Ignore all JavaScript outputs (keep TypeScript)
+*.js
+*.jsx
+*.js.map
+*.cjs
+*.mjs
+
+# Ignore type definition maps
+*.d.ts.map
+
+# Editor junk
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
