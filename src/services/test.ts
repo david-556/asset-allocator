@@ -1,6 +1,7 @@
 import { totalValue, allocationByType, percentageByType, driftFromTarget } from "./portfolioCalculations"
 import { Target } from "../models/Target"
 import { Asset } from "../models/Asset"
+import { addAsset, initialPortfolio } from "../storage/portfolioStore"
 
 const assets: Asset[] = [
     {id: "1", name: "MSCI World", type: "ETF", value: 7000},
@@ -16,8 +17,17 @@ const targets: Target[] = [
 
 const currentPercent = {ETF: 90, Stock: 10}
 
-console.log("Drift:", driftFromTarget(currentPercent, targets))
+let portfolio = initialPortfolio
+
+portfolio = addAsset(portfolio, {
+    id: "1", 
+    name: "MSCI World", 
+    type: "ETF",
+    value: 7000
+})
+
+/*console.log("Drift:", driftFromTarget(currentPercent, targets))
 console.log("Total Value:", totalValue(assets))
 console.log("Allocation:", allocationByType(assets))
-console.log("Percentages:", percentageByType(assets))
-
+console.log("Percentages:", percentageByType(assets)) */
+console.log(portfolio)
