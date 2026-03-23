@@ -2,6 +2,7 @@ import { totalValue, allocationByType, percentageByType, driftFromTarget } from 
 import { Target } from "../models/Target"
 import { Asset } from "../models/Asset"
 import { addAsset, initialPortfolio } from "../storage/portfolioStore"
+import { loadPortfolio, savePortfolio } from "../storage/localStorage"
 
 const assets: Asset[] = [
     {id: "1", name: "MSCI World", type: "ETF", value: 7000},
@@ -17,7 +18,7 @@ const targets: Target[] = [
 
 const currentPercent = {ETF: 90, Stock: 10}
 
-let portfolio = initialPortfolio
+let portfolio = loadPortfolio()
 
 portfolio = addAsset(portfolio, {
     id: "1", 
@@ -25,6 +26,8 @@ portfolio = addAsset(portfolio, {
     type: "ETF",
     value: 7000
 })
+
+savePortfolio(portfolio)
 
 /*console.log("Drift:", driftFromTarget(currentPercent, targets))
 console.log("Total Value:", totalValue(assets))

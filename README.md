@@ -1,7 +1,45 @@
-#📊 Portfolio Allocation Tracker#
+# 📊 Portfolio Allocation Tracker
 
-A privacy-focused web application to visualize and manage personal investment portfolio allocation.
+A minimal web app to track and analyze personal investment portfolios with a focus on **asset allocation** and **rebalancing**.
 
-The application allows users to track their holdings, analyze asset allocation, compare it to target allocations, and receive simple rebalancing suggestions.
+---
 
-The goal of this project is to provide a minimal, transparent alternative to broker dashboards, focusing on allocation rather than trading.
+## ✨ Features
+
+- 📊 Portfolio dashboard (value + allocation)
+- 📁 Manage holdings (add/edit/delete assets)
+- 🎯 Define target allocation
+- ⚖️ Rebalancing suggestions based on targets
+
+---
+
+## 🛠 Tech Stack
+
+- React / Next.js
+- TypeScript
+- localStorage (no backend)
+
+---
+
+## 🧱 Structure
+src/
+├ components/
+├ pages/
+├ models/
+├ services/
+├ store/
+└ storage/
+
+---
+
+## 🚀 Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+## 🔒 Privacy
+
+All data is stored locally in the browser. No external services are used.
+
