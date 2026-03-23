@@ -21,17 +21,6 @@ A minimal web app to track and analyze personal investment portfolios with a foc
 
 ---
 
-## 🧱 Structure
-src/
-├ components/
-├ pages/
-├ models/
-├ services/
-├ store/
-└ storage/
-
----
-
 ## 🚀 Getting Started
 
 ```bash
