@@ -1,16 +1,34 @@
 "use client"; 
 
-import { useState, type ComponentProps } from "react"
+import { useEffect, useState, type ComponentProps } from "react"
 import { Asset } from "@/src/models/Asset"
 
 type Props = {
-    onAddAsset: (asset: Asset) => void; 
+    onAddAsset?: (asset: Asset) => void;
+    onUpdateAsset?: (asset: Asset) => void
+    initialAsset?: Asset | null
 }
 
-export default function AssetForm({onAddAsset}: Props) {
+export default function AssetForm({
+    onAddAsset,
+    onUpdateAsset,
+    initialAsset = null,
+}: Props) {
     const[name, setName] = useState("")
     const[type, setType] = useState<Asset["type"]>("ETF")
     const[value, setValue] = useState("")
+
+    useEffect(() => {
+        if(initialAsset) {
+            setName(initialAsset.name)
+            setType(initialAsset.type)
+            setValue(String(initialAsset.value));
+        } else {
+            setName("")
+            setType("ETF")
+            setValue("")
+        }
+    }, [initialAsset]);
 
     const handleSubmit: ComponentProps<"form">["onSubmit"] = (e) => {
         e.preventDefault()
@@ -18,18 +36,23 @@ export default function AssetForm({onAddAsset}: Props) {
         if(!name.trim() || !value ) return
 
         const newAsset: Asset = {
-            id: crypto.randomUUID(),
+            id: initialAsset ? initialAsset.id: crypto.randomUUID(),
             name: name.trim(),
             type,
             value: Number(value)
         };
 
-        onAddAsset(newAsset)
+        if(initialAsset) {
+            onUpdateAsset?.(newAsset)
+        } else {
+            onAddAsset?.(newAsset)
+        }
 
-        setName("")
-        setType("ETF")
-        setValue("")
-
+        if(!initialAsset) {
+            setName("")
+            setType("ETF")
+            setValue("")
+        }
     }
 
     return (
@@ -45,7 +68,8 @@ export default function AssetForm({onAddAsset}: Props) {
 
             <div>
                 <label>Type</label>
-                <select value={type} onChange={(e) => setType(e.target.value as Asset["type"])}>
+                <select value={type} 
+                        onChange={(e) => setType(e.target.value as Asset["type"])}>
                     <option value="ETF">ETF</option>
                     <option value="Stock">Stock</option>
                     <option value="Crypto">Crypto</option>
@@ -62,7 +86,7 @@ export default function AssetForm({onAddAsset}: Props) {
                 />
             </div>
 
-            <button type="submit">Add Asset</button>
+            <button type="submit">{initialAsset ? "Update Asset" : "Add Asset"}</button>
         </form>
     )
 }
