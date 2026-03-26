@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import AssetTable from "@/src/components/AssetTable"
 import AssetForm from "@/src/components/AssetForm"
 import {Asset} from "@/src/models/Asset"
@@ -47,6 +48,9 @@ export default function HoldingsPage() {
     return (
         <div>
             <h1>Holdings</h1>
+            <p>
+                <Link href="/">Go to Dashboard</Link>
+            </p>
 
             <AssetForm 
                 onAddAsset={handleAddAsset}
@@ -59,6 +63,6 @@ export default function HoldingsPage() {
                 onEdit={handleStartEdit}
             />
         </div>
-
+        
     )
   }
