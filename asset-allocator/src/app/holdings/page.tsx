@@ -7,6 +7,7 @@ import AssetForm from "@/src/components/AssetForm"
 import {Asset} from "@/src/models/Asset"
 import {loadPortfolio, savePortfolio} from "@/src/storage/localStorage"
 import {addAsset, PortfolioState, deleteAsset, updateAsset} from "@/src/storage/portfolioStore"
+import styles from "./holdings.module.css"
 
 export default function HoldingsPage() {
 
@@ -46,23 +47,34 @@ export default function HoldingsPage() {
 
 
     return (
-        <div>
-            <h1>Holdings</h1>
-            <p>
-                <Link href="/">Go to Dashboard</Link>
-            </p>
+        <main className={styles.container}>
+        <div className={styles.wrapper}>
+            <header className={styles.header}>
+                <p className={styles.subtitle}>Portfolio Management</p>
+                <h1 className={styles.title}>Holdings</h1>
+                <p>
+                    <Link href="/">Go to Dashboard</Link>
+                </p>
+            </header>
+
+            <section className={styles.card}>
 
             <AssetForm 
                 onAddAsset={handleAddAsset}
                 onUpdateAsset={handleUpdateAsset}
                 initialAsset={editingAsset}
             />
+            </section>
+
+            <section className={styles.card}>
             <AssetTable 
                 assets={portfolio.assets} 
                 onDelete={handleDelete}
                 onEdit={handleStartEdit}
             />
-        </div>
+            </section>
+            </div>
+        </main>
         
     )
   }

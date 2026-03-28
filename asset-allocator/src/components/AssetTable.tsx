@@ -1,4 +1,5 @@
 import { Asset } from "../models/Asset"
+import styles from "@/src/app/holdings/holdings.module.css"
 
 type Props = {
     assets: Asset[]
@@ -8,7 +9,7 @@ type Props = {
 
 export default function AssetTable({ assets, onDelete, onEdit}: Props) {
     return (
-        <table>
+        <table className={styles.table}>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -20,17 +21,23 @@ export default function AssetTable({ assets, onDelete, onEdit}: Props) {
 
             <tbody>
                 {assets.map(asset => (
-                    <tr key={asset.id}>
+                    <tr key={asset.id} className={styles.row}>
                         <td>{asset.name}</td>
                         <td>{asset.type}</td>
                         <td>{asset.value}</td>
                         <td>
-                            <button onClick={() => onEdit(asset)}>
+                            <div className={styles.actions}>
+                            <button 
+                            className={styles.button}
+                            onClick={() => onEdit(asset)}>
                                 Edit
                             </button>
-                            <button onClick={() => onDelete(asset.id)}>
+                            <button 
+                            className={`${styles.button} ${styles.deleteButton}`}
+                            onClick={() => onDelete(asset.id)}>
                                 Delete
                             </button>
+                            </div>
                         </td>
                     </tr>
                 ))}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ComponentProps } from "react"
 import { Asset } from "@/src/models/Asset"
+import styles from "@/src/app/holdings/holdings.module.css"
 
 type Props = {
     onAddAsset?: (asset: Asset) => void;
@@ -56,19 +57,21 @@ export default function AssetForm({
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Name</label>
+        <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.field}>
+                <label className={styles.label}>Name</label>
                 <input
+                    className={styles.input}
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
             </div>
 
-            <div>
-                <label>Type</label>
-                <select value={type} 
+            <div className={styles.field}>
+                <label className={styles.label}>Type</label>
+                <select className={styles.select}
+                        value={type} 
                         onChange={(e) => setType(e.target.value as Asset["type"])}>
                     <option value="ETF">ETF</option>
                     <option value="Stock">Stock</option>
@@ -77,16 +80,17 @@ export default function AssetForm({
                 </select>
             </div>
 
-            <div>
-                <label>Value</label>
+            <div className={styles.field}>
+                <label className={styles.label}>Value</label>
                 <input 
+                    className={styles.input}
                     type="number"
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
 
-            <button type="submit">{initialAsset ? "Update Asset" : "Add Asset"}</button>
+            <button type="submit" className={styles.submitButton}>{initialAsset ? "Update Asset" : "Add Asset"}</button>
         </form>
     )
 }

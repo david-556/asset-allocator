@@ -6,6 +6,7 @@ import { initialPortfolio, PortfolioState } from "../storage/portfolioStore";
 import { totalValue, allocationByType, percentageByType } from "../services/portfolioCalculations";
 import Link from "next/link"
 import AllocationPieChart from "../components/AllocationPieChart";
+import styles from "./dashboard.module.css"
 
 export default function DashboardPage() {
   const [portfolio, setPortfolio] = useState<PortfolioState>(initialPortfolio)
@@ -33,59 +34,75 @@ export default function DashboardPage() {
 
 
   return (
-    <div>
-      <h1>Asset Allocator</h1>
-      <h1>{total.toFixed(2)} €</h1>
+    <main className={styles.container}>
+    <div className={styles.wrapper}>
+      <header className={styles.header}>
+        <p className={styles.subtitle}>
+          Portfolio Dashboard
+        </p>
+        <h1 className={styles.title}>
+          Asset Allocator
+        </h1>
+        <p className={styles.value}>
+        {total.toFixed(2)} €
+        </p>
+      </header>
 
-      <div>
-        <button onClick={() => setView("asset")}>By Asset</button>
-        <button onClick={() => setView("type")}>By Type</button>
+      <section className={styles.card}>
+
+      <div className={styles.toggle}>
+        <button onClick={() => setView("asset")}
+          className={`${styles.button} ${
+            view === "asset" ? styles.active : ""
+          }`}
+          >By Asset</button>
+        <button onClick={() => setView("type")}
+          className={`${styles.button} ${
+            view === "type" ? styles.active : ""
+          }`}
+          >By Type</button>
       </div>
 
-      <AllocationPieChart data= {chartData}/>
+      <div className={styles.chartContainer}>
+        <AllocationPieChart data= {chartData}/>
+      </div>
 
-      {view == "asset" ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Value (€)</th>
-              <th>%</th>
-            </tr>
-          </thead>
-          <tbody>
-            {portfolio.assets.map((asset) => (
-              <tr key={asset.id}>
-                <td>{asset.name}</td>
-                <td>{asset.value.toFixed(2)}</td>
-                <td>{total > 0 ? ((asset.value /total) * 100).toFixed(2) : "0.00"}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Value (€)</th>
-              <th>%</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(byType).map(([type, value]) => (
-              <tr key={type}>
-                <td>{type}</td>
-                <td>{value.toFixed(2)}</td>
-                <td>{percentages[type].toFixed(2)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>{view === "asset" ? "Asset" : "Type"}</th>
+            <th>Value (€)</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {view === "asset"
+            ? portfolio.assets.map((asset) => (
+                <tr key={asset.id} className={styles.row}>
+                  <td>{asset.name}</td>
+                  <td>{asset.value.toFixed(2)}</td>
+                  <td>
+                    {total > 0
+                      ? ((asset.value / total) * 100).toFixed(2)
+                      : "0.00"}
+                    %
+                  </td>
+                </tr>
+              ))
+            : Object.entries(byType).map(([type, value]) => (
+                <tr key={type} className={styles.row}>
+                  <td>{type}</td>
+                  <td>{value.toFixed(2)}</td>
+                  <td>{percentages[type].toFixed(2)}%</td>
+                </tr>
+              ))}
+        </tbody>
+      </table>
       <p>
         <Link href="/holdings">Go to Holdings</Link>
       </p>
+      </section>
     </div>
+    </main>
   )
 }
