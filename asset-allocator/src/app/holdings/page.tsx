@@ -55,6 +55,9 @@ export default function HoldingsPage() {
                 <p>
                     <Link href="/">Go to Dashboard</Link>
                 </p>
+                <p>
+                    <Link href="/targets">Go to Targets Page</Link>
+                </p>
             </header>
 
             <section className={styles.card}>
