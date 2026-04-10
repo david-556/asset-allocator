@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import AssetTable from "@/src/components/AssetTable"
 import AssetForm from "@/src/components/AssetForm"
 import {Asset} from "@/src/models/Asset"
@@ -52,12 +51,6 @@ export default function HoldingsPage() {
             <header className={styles.header}>
                 <p className={styles.subtitle}>Portfolio Management</p>
                 <h1 className={styles.title}>Holdings</h1>
-                <p>
-                    <Link href="/">Go to Dashboard</Link>
-                </p>
-                <p>
-                    <Link href="/targets">Go to Targets Page</Link>
-                </p>
             </header>
 
             <section className={styles.card}>

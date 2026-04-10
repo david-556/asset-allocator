@@ -11,7 +11,6 @@ import {
     driftFromTarget,
     totalValue,
 } from "@/src/services/portfolioCalculations"
-import Link from "next/link"
 
 const ASSET_TYPES: Target["assetType"][] = ["ETF", "Stock", "Crypto", "Cash"]
 
@@ -90,9 +89,6 @@ export default function TargetsPage() {
                 <header className={styles.header}>
                     <p className={styles.subtitle}>Portfolio Planning</p>
                     <h1 className={styles.title}>Targets</h1>
-                    <p>
-                    <Link href="/">Go to Dashboard</Link>
-                    </p>
                 </header>
 
                 <section className={styles.card}>

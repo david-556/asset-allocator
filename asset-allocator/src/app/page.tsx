@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { loadPortfolio } from "../storage/localStorage";
 import { initialPortfolio, PortfolioState } from "../storage/portfolioStore";
 import { totalValue, allocationByType, percentageByType } from "../services/portfolioCalculations";
-import Link from "next/link"
 import AllocationPieChart from "../components/AllocationPieChart";
 import styles from "./dashboard.module.css"
 
@@ -98,10 +97,7 @@ export default function DashboardPage() {
               ))}
         </tbody>
       </table>
-      <p>
-        <Link href="/holdings">Go to Holdings</Link>
-      </p>
-      </section>
+</section>
     </div>
     </main>
   )
