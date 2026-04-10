@@ -1,3 +1,5 @@
+/*to save data in browser */
+
 import { PortfolioState, initialPortfolio } from "./portfolioStore";
 
 const PORTFOLIO_KEY = "portfolio"

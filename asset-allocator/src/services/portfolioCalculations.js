@@ -60,7 +60,7 @@ function driftFromTarget(current, targets) {
 }
 function calculateInvestmentDistribution(amount, currentValuesByType, targets) {
     var total = Object.keys(currentValuesByType).reduce(function (s, key) { return s + currentValuesByType[key]; }, 0);
-    //if portfolio is empty, just split by target % 
+    //if portfolio is empty, just split by target %
     if (total <= 0) {
         return targets.map(function (t) { return ({
             type: t.assetType,
@@ -72,11 +72,11 @@ function calculateInvestmentDistribution(amount, currentValuesByType, targets) {
     var gaps = targets.map(function (t) {
         var current = currentValuesByType[t.assetType] || 0;
         var desired = (desiredTotal * t.percent) / 100;
-        var gap = Math.max(0, desired - current); // only invest into underweight categories 
+        var gap = Math.max(0, desired - current); // only invest into underweight categories
         return { type: t.assetType, gap: gap };
     });
     var totalGap = gaps.reduce(function (s, g) { return s + g.gap; }, 0);
-    //If nothing is underweight (or rounding), then fallback to target split 
+    //If nothing is underweight (or rounding), then fallback to target split
     if (totalGap <= 0) {
         return targets.map(function (t) { return ({
             type: t.assetType,

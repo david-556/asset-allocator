@@ -6,7 +6,7 @@ import { loadPortfolio, savePortfolio } from "../storage/localStorage"
 
 const assets: Asset[] = [
     {id: "1", name: "MSCI World", type: "ETF", value: 7000},
-    {id: "2", name: "EM ETF", type: "ETF", value: 2000}, 
+    {id: "2", name: "EM ETF", type: "ETF", value: 2000},
     {id: "3", name: "BYD", type: "Stock", value: 1000}
 ]
 
@@ -21,8 +21,8 @@ const currentPercent = {ETF: 90, Stock: 10}
 let portfolio = loadPortfolio()
 
 portfolio = addAsset(portfolio, {
-    id: "1", 
-    name: "MSCI World", 
+    id: "1",
+    name: "MSCI World",
     type: "ETF",
     value: 7000
 })

@@ -25,7 +25,7 @@ export function allocationByType(assets: Asset[]) {
 }
 
 /**
- * Calculates drift from one asset 
+ * Calculates drift from one asset
  */
 
 export function driftFromTarget(current: Record<string, number>, targets: Target[]) {
@@ -39,7 +39,7 @@ export function driftFromTarget(current: Record<string, number>, targets: Target
     targets.forEach(t => {
         const currentPercent = current[t.assetType] || 0
         const drift = currentPercent - t.percent
-        
+
         result.push({
             type: t.assetType,
             current: currentPercent,
@@ -54,7 +54,7 @@ export function driftFromTarget(current: Record<string, number>, targets: Target
 export function calculateInvestmentDistribution(
     amount: number,
     currentValuesByType: Record<string, number>,
-    targets: Target[] 
+    targets: Target[]
 ) {
 
     const total = Object.keys(currentValuesByType).reduce(
@@ -62,7 +62,7 @@ export function calculateInvestmentDistribution(
         0
     )
 
-    //if portfolio is empty, just split by target % 
+    //if portfolio is empty, just split by target %
     if (total <= 0) {
         return targets.map(t => ({
             type: t.assetType,
@@ -76,13 +76,13 @@ export function calculateInvestmentDistribution(
     const gaps = targets.map(t => {
         const current = currentValuesByType[t.assetType] || 0
         const desired = (desiredTotal * t.percent) / 100
-        const gap = Math.max(0, desired - current) // only invest into underweight categories 
+        const gap = Math.max(0, desired - current) // only invest into underweight categories
         return {type: t.assetType, gap}
     })
 
     const totalGap = gaps.reduce((s,g) => s + g.gap, 0)
 
-    //If nothing is underweight (or rounding), then fallback to target split 
+    //If nothing is underweight (or rounding), then fallback to target split
     if(totalGap <= 0) {
         return targets.map(t => ({
             type: t.assetType,
@@ -98,8 +98,8 @@ export function calculateInvestmentDistribution(
 
     //Fix rounding so amounts sum exactly to 'amount' (in cents)
     distribution = fixRounding(distribution, amount)
-    
-    return distribution 
+
+    return distribution
 
 }
 
@@ -126,7 +126,7 @@ function fixRounding(
 ) {
     const toCents = (x: number) => Math.round(x * 100)
     const fromCents = (x: number) => x / 100
-    
+
     const targetCents = toCents(total)
     const sumCents = items.reduce((s,i) => s + toCents(i.amount), 0)
     let diff = targetCents - sumCents
@@ -145,7 +145,7 @@ function fixRounding(
         amount: fromCents(toCents(updated[maxIdx].amount) + diff)
     }
 
-    return updated 
+    return updated
 }
 
 function round2(value: number) {

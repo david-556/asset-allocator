@@ -1,0 +1,53 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #000;
+  border-bottom: 1px solid #1f2937;
+  font-family: system-ui, sans-serif;
+}
+
+.inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f3f4f6;
+  letter-spacing: 0.02em;
+}
+
+.links {
+  display: flex;
+  gap: 6px;
+}
+
+.link {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: #9ca3af;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.link:hover {
+  background: #1f2937;
+  color: #f3f4f6;
+}
+
+.active {
+  background: #fff;
+  color: #000;
+}
+
+.active:hover {
+  background: #f3f4f6;
+  color: #000;
+}
