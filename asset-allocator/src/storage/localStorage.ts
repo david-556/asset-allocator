@@ -35,7 +35,11 @@ export function loadPortfolio(): PortfolioState {
     }
 
     try {
-        return JSON.parse(raw) as PortfolioState
+        const parsed = JSON.parse(raw) as PortfolioState
+        return {
+            ...initialPortfolio,
+            ...parsed,
+        }
     } catch {
         return initialPortfolio
     }

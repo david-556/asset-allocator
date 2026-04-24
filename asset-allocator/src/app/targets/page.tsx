@@ -1,13 +1,15 @@
 "use client";
 
-import {useMemo, useState} from "react"
+import React, {useMemo, useState} from "react"
 import styles from "./targets.module.css"
 import type {Target} from "@/src/models/Target"
+import type {AssetTarget} from "@/src/models/Target"
 import { loadPortfolio, savePortfolio} from "@/src/storage/localStorage";
-import {PortfolioState, setTargets} from "@/src/storage/portfolioStore"
+import {PortfolioState, setAssetTargets, setTargets} from "@/src/storage/portfolioStore"
 import {
     allocationByType,
     calculateInvestmentDistribution,
+    distributeAmongAssets,
     driftFromTarget,
     totalValue,
 } from "@/src/services/portfolioCalculations"
@@ -33,36 +35,63 @@ export default function TargetsPage() {
         return map
     }, [portfolio.targets])
 
-    const [targetInputs, setTargetInputs] = useState(initialInputs); 
+    const [targetInputs, setTargetInputs] = useState(initialInputs);
 
-    const currentValuesByType = allocationByType(portfolio.assets); 
+    const initialAssetInputs = useMemo(() => {
+        const map: Record<string, string> = {}
+        portfolio.assetTargets.forEach((t: AssetTarget) => {
+            map[t.assetId] = String(t.percent)
+        })
+        return map
+    }, [portfolio.assetTargets])
+
+    const [assetTargetInputs, setAssetTargetInputs] = useState<Record<string, string>>(initialAssetInputs)
+
+    const currentValuesByType = allocationByType(portfolio.assets);
     const total = totalValue(portfolio.assets)
 
     const currentPercentages: Record<string, number> = {}
     Object.entries(currentValuesByType).forEach(([type, value]) => {
-        currentPercentages[type] = total > 0 ? (value/total) * 100 : 0; 
+        currentPercentages[type] = total > 0 ? (value/total) * 100 : 0;
     })
 
-    const drift = 
-        portfolio.targets.length > 0
-        ? driftFromTarget(currentPercentages, portfolio.targets)
-        : []; 
+    const liveTargets: Target[] = ASSET_TYPES
+        .map(assetType => ({
+            assetType,
+            percent: Number(targetInputs[assetType]) || 0,
+        }))
+        .filter(t => t.percent > 0)
 
-        const investmentPlan = 
-            portfolio.targets.length > 0 && investmentAmount
-            ? calculateInvestmentDistribution(
-                Number(investmentAmount),
-                currentValuesByType,
-                portfolio.targets
-            )
-            : []
+    const drift =
+        liveTargets.length > 0
+        ? driftFromTarget(currentPercentages, liveTargets)
+        : [];
+
+    const typeDistribution =
+        liveTargets.length > 0 && investmentAmount
+        ? calculateInvestmentDistribution(
+            Number(investmentAmount),
+            currentValuesByType,
+            liveTargets
+        )
+        : []
+
+    const investmentPlan = useMemo(() => {
+        if (!typeDistribution.length) return []
+        return distributeAmongAssets(
+            typeDistribution,
+            portfolio.assets,
+            portfolio.assetTargets,
+            Number(investmentAmount) || 0
+        )
+    }, [typeDistribution, portfolio.assets, portfolio.assetTargets, investmentAmount])
 
     function handleTargetChange(
         assetType: Target["assetType"],
         value: string
     ) {
         setTargetInputs((prev: Record<Target["assetType"], string>) => ({
-            ...prev, 
+            ...prev,
             [assetType]: value,
         }))
     }
@@ -78,10 +107,41 @@ export default function TargetsPage() {
         savePortfolio(updated)
     }
 
+    function handleAssetTargetChange(assetId: string, value: string) {
+        setAssetTargetInputs(prev => ({ ...prev, [assetId]: value }))
+    }
+
+    function handleSaveAssetTargets() {
+        const newAssetTargets: AssetTarget[] = portfolio.assets
+            .filter(a => assetTargetInputs[a.id] && Number(assetTargetInputs[a.id]) > 0)
+            .map(a => ({
+                assetId: a.id,
+                percent: Number(assetTargetInputs[a.id]),
+            }))
+
+        const updated = setAssetTargets(portfolio, newAssetTargets)
+        setPortfolio(updated)
+        savePortfolio(updated)
+    }
+
     const totalTargetPercent = ASSET_TYPES.reduce(
         (sum, type) => sum + (Number(targetInputs[type] || 0)),
         0
     )
+
+    const totalAssetTargetPercent = portfolio.assets.reduce(
+        (sum, a) => sum + (Number(assetTargetInputs[a.id] || 0)),
+        0
+    )
+
+    const assetsByType = useMemo(() => {
+        const map: Record<string, typeof portfolio.assets> = {}
+        portfolio.assets.forEach(a => {
+            if (!map[a.type]) map[a.type] = []
+            map[a.type].push(a)
+        })
+        return map
+    }, [portfolio.assets])
 
     return (
         <main className={styles.container}>
@@ -97,7 +157,7 @@ export default function TargetsPage() {
                         {ASSET_TYPES.map((type) => (
                             <div key={type} className={styles.field}>
                                 <label className={styles.label}>{type}</label>
-                                <input 
+                                <input
                                     className={styles.input}
                                     type="number"
                                     value={targetInputs[type]}
@@ -120,10 +180,51 @@ export default function TargetsPage() {
                     </button>
 
                 </section>
-                
+
+                {portfolio.assets.length > 0 && (
+                    <section className={styles.card}>
+                        <h2>Asset Targets</h2>
+                        <p style={{color: "#6b7280", fontSize: "14px", marginBottom: "16px"}}>
+                            Set a target % of your total portfolio for individual assets. Leave blank to skip.
+                        </p>
+
+                        {ASSET_TYPES.filter(type => assetsByType[type]?.length > 0).map(type => (
+                            <div key={type} style={{marginBottom: "20px"}}>
+                                <p style={{color: "#9ca3af", fontSize: "13px", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px"}}>{type}</p>
+                                <div className={styles.formGrid}>
+                                    {assetsByType[type].map(asset => (
+                                        <div key={asset.id} className={styles.field}>
+                                            <label className={styles.label}>{asset.name}</label>
+                                            <input
+                                                className={styles.input}
+                                                type="number"
+                                                placeholder="e.g. 40"
+                                                value={assetTargetInputs[asset.id] ?? ""}
+                                                onChange={e => handleAssetTargetChange(asset.id, e.target.value)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        <p style={{marginTop: "8px", color: "#9ca3af"}}>
+                            Total: {totalAssetTargetPercent}%
+                        </p>
+
+                        <button
+                            className={styles.button}
+                            onClick={handleSaveAssetTargets}
+                            style={{marginTop: "16px"}}
+                        >
+                            Save Asset Targets
+                        </button>
+                    </section>
+                )}
+
                 <section className={styles.card}>
                     <h2>Drift from Target</h2>
-                
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -154,7 +255,7 @@ export default function TargetsPage() {
 
                     <div className={styles.field}>
                         <label className={styles.label}>Investment Amount (€)</label>
-                        <input 
+                        <input
                             className={styles.input}
                             type="number"
                             value={investmentAmount}
@@ -165,16 +266,24 @@ export default function TargetsPage() {
                     <table className={styles.table} style={{marginTop: "20px"}}>
                         <thead>
                             <tr>
-                                <th>Type</th>
+                                <th>Type / Asset</th>
                                 <th>Suggested Investment (€)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {investmentPlan.map((item) => (
-                                <tr key={item.type} className={styles.row}>
-                                    <td>{item.type}</td>
-                                    <td>{item.amount.toFixed(2)}</td>
-                                </tr>
+                            {investmentPlan.map((row) => (
+                                <React.Fragment key={row.type}>
+                                    <tr className={styles.row}>
+                                        <td style={{fontWeight: 600}}>{row.type}</td>
+                                        <td style={{fontWeight: 600}}>{row.typeAmount.toFixed(2)}</td>
+                                    </tr>
+                                    {row.breakdown.map(asset => (
+                                        <tr key={asset.assetId} className={styles.row}>
+                                            <td style={{paddingLeft: "28px", color: "#9ca3af"}}>↳ {asset.assetName}</td>
+                                            <td style={{color: "#9ca3af"}}>{asset.amount.toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </table>

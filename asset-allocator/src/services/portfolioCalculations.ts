@@ -1,5 +1,5 @@
 import { Asset } from "../models/Asset"
-import { Target } from "../models/Target"
+import { AssetTarget, Target } from "../models/Target"
 
 
 /**
@@ -150,4 +150,98 @@ function fixRounding(
 
 function round2(value: number) {
     return Math.round(value * 100) / 100
+}
+
+export type AssetDistributionRow = {
+    type: string
+    typeAmount: number
+    breakdown: { assetId: string; assetName: string; amount: number }[]
+}
+
+export function distributeAmongAssets(
+    typeDistribution: { type: string; amount: number }[],
+    assets: Asset[],
+    assetTargets: AssetTarget[],
+    investmentAmount: number
+): AssetDistributionRow[] {
+    const totalBeforeInvestment = assets.reduce((s, a) => s + a.value, 0)
+    const desiredTotal = totalBeforeInvestment + investmentAmount
+
+    return typeDistribution.map(({ type, amount }) => {
+        const assetsOfType = assets.filter(a => a.type === type)
+
+        if (assetsOfType.length <= 1) {
+            return {
+                type,
+                typeAmount: amount,
+                breakdown: assetsOfType.map(a => ({ assetId: a.id, assetName: a.name, amount })),
+            }
+        }
+
+        const targetedAssets = assetsOfType.filter(a =>
+            assetTargets.some(t => t.assetId === a.id)
+        )
+
+        let breakdown: { assetId: string; assetName: string; amount: number }[]
+
+        if (targetedAssets.length === 0) {
+            // no explicit targets → distribute proportional to current value
+            const typeTotal = assetsOfType.reduce((s, a) => s + a.value, 0)
+            if (typeTotal <= 0) {
+                const equal = round2(amount / assetsOfType.length)
+                breakdown = assetsOfType.map(a => ({ assetId: a.id, assetName: a.name, amount: equal }))
+            } else {
+                breakdown = assetsOfType.map(a => ({
+                    assetId: a.id,
+                    assetName: a.name,
+                    amount: round2((amount * a.value) / typeTotal),
+                }))
+            }
+        } else {
+            const gaps = targetedAssets.map(a => {
+                const target = assetTargets.find(t => t.assetId === a.id)!
+                const desired = (desiredTotal * target.percent) / 100
+                const gap = Math.max(0, desired - a.value)
+                return { assetId: a.id, assetName: a.name, gap }
+            })
+
+            const totalGap = gaps.reduce((s, g) => s + g.gap, 0)
+
+            if (totalGap <= 0) {
+                const totalTargetPct = targetedAssets.reduce((s, a) => {
+                    const t = assetTargets.find(x => x.assetId === a.id)!
+                    return s + t.percent
+                }, 0)
+                breakdown = targetedAssets.map(a => {
+                    const t = assetTargets.find(x => x.assetId === a.id)!
+                    return {
+                        assetId: a.id,
+                        assetName: a.name,
+                        amount: round2(totalTargetPct > 0 ? (amount * t.percent) / totalTargetPct : 0),
+                    }
+                })
+            } else {
+                breakdown = gaps.map(g => ({
+                    assetId: g.assetId,
+                    assetName: g.assetName,
+                    amount: round2((amount * g.gap) / totalGap),
+                }))
+            }
+        }
+
+        // fix rounding within breakdown to match typeAmount
+        const breakdownSum = breakdown.reduce((s, b) => s + b.amount, 0)
+        const diff = round2(amount - breakdownSum)
+        if (diff !== 0 && breakdown.length > 0) {
+            let maxIdx = 0
+            for (let i = 1; i < breakdown.length; i++) {
+                if (breakdown[i].amount > breakdown[maxIdx].amount) maxIdx = i
+            }
+            breakdown = breakdown.map((b, i) =>
+                i === maxIdx ? { ...b, amount: round2(b.amount + diff) } : b
+            )
+        }
+
+        return { type, typeAmount: amount, breakdown }
+    })
 }

@@ -1,14 +1,16 @@
 import { Asset } from "../models/Asset"
-import { Target } from "../models/Target"
+import { AssetTarget, Target } from "../models/Target"
 
 export type PortfolioState = {
     assets: Asset[]
     targets: Target[]
+    assetTargets: AssetTarget[]
 }
 
 export const initialPortfolio: PortfolioState = {
     assets: [],
-    targets: []
+    targets: [],
+    assetTargets: [],
 }
 
 export function addAsset(state: PortfolioState, asset: Asset): PortfolioState {
@@ -36,5 +38,12 @@ export function setTargets(state: PortfolioState, targets: Target[]): PortfolioS
     return {
         ...state,
         targets
+    }
+}
+
+export function setAssetTargets(state: PortfolioState, assetTargets: AssetTarget[]): PortfolioState {
+    return {
+        ...state,
+        assetTargets
     }
 }
